@@ -1,0 +1,96 @@
+{
+  "entities": {
+    "RepairRequestLead": {
+      "title": "RepairRequestLead",
+      "description": "Customer repair booking request and lead lifecycle tracking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "customerName": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "whatsappNumber": { "type": "string", "maxLength": 20 },
+        "email": { "type": "string", "maxLength": 100 },
+        "address": { "type": "string", "maxLength": 250 },
+        "locality": { "type": "string", "maxLength": 100 },
+        "pincode": { "type": "string", "maxLength": 10 },
+        "addressType": { "type": "string", "enum": ["Home", "Office", "Other"] },
+        "category": { "type": "string", "enum": ["phones", "tablets", "laptops", "desktops", "consoles"] },
+        "brand": { "type": "string", "maxLength": 50 },
+        "model": { "type": "string", "maxLength": 100 },
+        "repairIssue": { "type": "string", "maxLength": 150 },
+        "quotedStartingPrice": { "type": "number" },
+        "preferredDate": { "type": "string", "maxLength": 30 },
+        "preferredTime": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "enum": ["NEW", "CONTACTED", "QUOTED", "CUSTOMER_RESPONDED", "CONFIRMED", "ASSIGNED", "TECHNICIAN_ON_WAY", "IN_PROGRESS", "COMPLETED", "CANCELLED", "LOST"] },
+        "jobStatus": { "type": "string", "enum": ["ASSIGNED", "ACCEPTED", "ON_THE_WAY", "ARRIVED", "DIAGNOSING", "AWAITING_APPROVAL", "REPAIRING", "COMPLETED", "CANCELLED"] },
+        "serviceOtp": { "type": "string", "maxLength": 10 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "customerName", "phone", "locality", "category", "repairIssue", "status"]
+    },
+    "BusinessSettings": {
+      "title": "BusinessSettings",
+      "description": "Store configuration, phone, WhatsApp number, and pricing constants",
+      "type": "object",
+      "properties": {
+        "businessName": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 25 },
+        "whatsappNumber": { "type": "string", "maxLength": 25 },
+        "email": { "type": "string", "maxLength": 100 },
+        "address": { "type": "string", "maxLength": 200 },
+        "heroHeadline": { "type": "string", "maxLength": 150 }
+      },
+      "required": ["businessName", "phone", "whatsappNumber"]
+    },
+    "Technician": {
+      "title": "Technician",
+      "description": "Doorstep service technician profile and territory",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "name": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 25 },
+        "availability": { "type": "string", "enum": ["AVAILABLE", "BUSY", "OFFLINE"] },
+        "rating": { "type": "number" },
+        "active": { "type": "boolean" }
+      },
+      "required": ["id", "name", "phone", "availability"]
+    },
+    "CustomerReview": {
+      "title": "CustomerReview",
+      "description": "Customer testimonials with device and locality verification",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "customerName": { "type": "string", "maxLength": 100 },
+        "locality": { "type": "string", "maxLength": 100 },
+        "device": { "type": "string", "maxLength": 100 },
+        "repair": { "type": "string", "maxLength": 100 },
+        "reviewText": { "type": "string", "maxLength": 500 },
+        "rating": { "type": "number" },
+        "verified": { "type": "boolean" },
+        "active": { "type": "boolean" }
+      },
+      "required": ["id", "customerName", "locality", "reviewText", "rating"]
+    }
+  },
+  "firestore": {
+    "/leads/{leadId}": {
+      "schema": { "$ref": "#/entities/RepairRequestLead" },
+      "description": "All customer doorstep repair leads and booking states"
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/BusinessSettings" },
+      "description": "Master business settings, phone numbers and branding"
+    },
+    "/technicians/{techId}": {
+      "schema": { "$ref": "#/entities/Technician" },
+      "description": "Service technicians and contact info"
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/CustomerReview" },
+      "description": "Approved customer testimonials"
+    }
+  }
+}

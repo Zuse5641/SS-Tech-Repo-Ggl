@@ -1,0 +1,6 @@
+{
+  "name": "SS Care Technology – Doorstep Electronics Repair Platform",
+  "description": "Bangalore's trusted doorstep electronics repair service for phones, laptops, tablets, desktops, and consoles. Certified technicians visit your home or office.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,113 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == "farhanshariff999@gmail.com" ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isTechnician() {
+      return isSignedIn() && exists(/databases/$(database)/documents/technicians/$(request.auth.uid));
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Public catalog content (read-only for guests, write for admin)
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /brands/{brandId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /models/{modelId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /repairs/{repairId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /service_areas/{areaId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /faqs/{faqId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Technicians collection
+    match /technicians/{techId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Leads & Repair requests
+    match /leads/{leadId} {
+      // Public can create new repair leads with valid payload
+      allow create: if request.resource.data.customerName is string &&
+                       request.resource.data.phone is string &&
+                       request.resource.data.locality is string &&
+                       request.resource.data.category is string &&
+                       request.resource.data.status == 'NEW';
+
+      // Anyone with the specific request ID can read their own repair status
+      allow get: if true;
+
+      // Only admins or assigned technicians can list or update leads
+      allow list: if isAdmin() || isTechnician();
+
+      allow update: if isAdmin() || (
+        isTechnician() &&
+        (resource.data.assignedTechnicianId == request.auth.uid || resource.data.assignedTechnicianId == null)
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // Invoices and warranties
+    match /invoices/{invoiceId} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow write: if isAdmin() || isTechnician();
+    }
+
+    match /warranties/{warrantyId} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow write: if isAdmin() || isTechnician();
+    }
+  }
+}
